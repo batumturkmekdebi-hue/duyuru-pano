@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <title>Okul Duyuruları</title>
+  <!-- 5 dakikada bir (300 sn) sayfayı otomatik yeniler ve yeni duyuruları alır -->
+  <meta http-equiv="refresh" content="300">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: transparent;
+      font-family: 'Segoe UI', Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 15px;
+    }
+    .duyuru-kart {
+      width: 100%;
+      max-width: 650px;
+      background: #ffffff;
+      border-radius: 16px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+      overflow: hidden;
+      border: 1px solid #e2e8f0;
+    }
+    .baslik {
+      background: linear-gradient(135deg, #f97316, #ea580c);
+      color: white;
+      padding: 18px 24px;
+      font-size: 26px;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .liste {
+      list-style: none;
+      padding: 5px 0;
+    }
+    .liste li {
+      padding: 15px 24px;
+      font-size: 20px;
+      color: #334155;
+      border-bottom: 1px solid #f1f5f9;
+      display: flex;
+      align-items: center;
+      line-height: 1.4;
+      font-weight: 500;
+    }
+    .liste li:last-child { border-bottom: none; }
+    .liste li::before {
+      content: "»";
+      color: #f97316;
+      font-weight: bold;
+      font-size: 26px;
+      margin-right: 14px;
+    }
+    .durum {
+      padding: 25px;
+      text-align: center;
+      font-size: 18px;
+      color: #64748b;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="duyuru-kart">
+    <div class="baslik">
+      📢 DUYURULAR
+    </div>
+    <ul class="liste" id="duyuruListesi">
+      <li class="durum">Duyurular okul sitesinden yükleniyor...</li>
+    </ul>
+  </div>
+
+  <script>
+    async function duyurulariGetir() {
+      // MEB web sitesindeki duyuru sayfası
+      const hedefUrl = 'https://batumturkokulu.meb.k12.tr/icerikler/icerikler/listele_1666204_Duyurular';
+      // Tarayıcı engelini aşmak için ücretsiz güvenli proxy
+      const proxyUrl = 'https://api.allorigins.win/get?url=' + encodeURIComponent(hedefUrl);
+
+      try {
+        const response = await fetch(proxyUrl);
+        const data = await response.json();
+        
+        // Gelen HTML'i ayrıştır
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(data.contents, 'text/html');
+
+        // MEB duyuru linklerini veya başlıklarını topla
+        const linkler = doc.querySelectorAll('#icerikler a, .icerik-liste a, a[href*="/icerikler/"]');
+        const listeEl = document.getElementById('duyuruListesi');
+        
+        const basliklar = [];
+        linkler.forEach(a => {
+          const metin = a.textContent.trim();
+          if (metin && metin.length > 5 && !basliklar.includes(metin)) {
+            basliklar.push(metin);
+          }
+        });
+
+        // En son 5-6 duyuruyu bas
+        if (basliklar.length > 0) {
+          listeEl.innerHTML = '';
+          basliklar.slice(0, 6).forEach(baslik => {
+            const li = document.createElement('li');
+            li.textContent = baslik;
+            listeEl.appendChild(li);
+          });
+        }
+      } catch (hata) {
+        console.error("Duyuru çekilemedi:", hata);
+      }
+    }
+
+    duyurulariGetir();
+  </script>
+</body>
+</html>
