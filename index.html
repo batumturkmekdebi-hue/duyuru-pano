@@ -2,7 +2,9 @@
 <html lang="tr">
 <head>
   <meta charset="UTF-8">
-  <title>Kayan Okul Duyuruları</title>
+  <title>Canlı Okul Duyuruları</title>
+  <!-- Her 10 dakikada bir sayfayı sıfırdan yenileyip web sitesindeki en taze duyuruları çeker -->
+  <meta http-equiv="refresh" content="600">
   <style>
     * {
       box-sizing: border-box;
@@ -19,8 +21,8 @@
       overflow: hidden;
     }
     .slider-kapsayici {
-      width: 92%;
-      max-width: 650px;
+      width: 94%;
+      max-width: 660px;
       height: 380px;
       background: #ffffff;
       border-radius: 20px;
@@ -40,7 +42,6 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      letter-spacing: 0.5px;
     }
     .slayt-alani {
       flex: 1;
@@ -55,8 +56,8 @@
       width: 100%;
       padding: 25px 35px;
       opacity: 0;
-      transform: translateY(30px);
-      transition: all 0.8s ease-in-out;
+      transform: translateY(25px);
+      transition: all 0.7s ease-in-out;
       pointer-events: none;
     }
     .duyuru-ogesi.aktif {
@@ -66,7 +67,7 @@
     }
     .duyuru-ogesi.cikis {
       opacity: 0;
-      transform: translateY(-30px);
+      transform: translateY(-25px);
     }
     .tarih-etiket {
       display: inline-block;
@@ -74,24 +75,23 @@
       color: #c2410c;
       font-size: 14px;
       font-weight: 600;
-      padding: 4px 10px;
+      padding: 4px 12px;
       border-radius: 20px;
       margin-bottom: 12px;
       border: 1px solid #ffedd5;
     }
     .duyuru-baslik {
-      font-size: 24px;
+      font-size: 22px;
       color: #0f172a;
       font-weight: 700;
-      line-height: 1.3;
+      line-height: 1.35;
       margin-bottom: 12px;
     }
     .duyuru-aciklama {
-      font-size: 18px;
+      font-size: 17px;
       color: #475569;
       line-height: 1.5;
     }
-    /* Alt ilerleme göstergesi */
     .gosterge-bari {
       position: absolute;
       bottom: 0;
@@ -101,6 +101,11 @@
       width: 0%;
       transition: width 6s linear;
     }
+    .yukleniyor {
+      font-size: 19px;
+      color: #64748b;
+      font-weight: 500;
+    }
   </style>
 </head>
 <body>
@@ -108,66 +113,39 @@
   <div class="slider-kapsayici">
     <div class="ust-bant">
       <span>📢 OKUL DUYURULARI</span>
-      <span id="sayac" style="font-size: 16px; opacity: 0.9;">1 / 5</span>
+      <span id="sayac" style="font-size: 16px; opacity: 0.9;">-- / --</span>
     </div>
 
-    <div class="slayt-alani">
-      <!-- Duyuru 1 -->
-      <div class="duyuru-ogesi aktif">
-        <span class="tarih-etiket">📅 Eylül 2026</span>
-        <h2 class="duyuru-baslik">Eylül Dönemi Sorumluluk Sınavları</h2>
-        <p class="duyuru-aciklama">Öğrencilerimizin ders bazlı sorumluluk sınav programı açıklanmıştır. İlgili derslerin gün ve saatlerine okul sitemizden ulaşabilirsiniz.</p>
-      </div>
-
-      <!-- Duyuru 2 -->
-      <div class="duyuru-ogesi">
-        <span class="tarih-etiket">📅 Ekim 2026</span>
-        <h2 class="duyuru-baslik">Duolingo İngilizce Bilgi Yarışması</h2>
-        <p class="duyuru-aciklama">Tüm kademelerdeki öğrencilerimiz arasında yabancı dil gelişimini destekleyici Duolingo puan sıralaması yarışması başlatılmıştır.</p>
-      </div>
-
-      <!-- Duyuru 3 -->
-      <div class="duyuru-ogesi">
-        <span class="tarih-etiket">📅 Güncel</span>
-        <h2 class="duyuru-baslik">Öğrenmede Yeni Nesil Yaklaşım</h2>
-        <p class="duyuru-aciklama">Derslerimizde interaktif eğitim araçları ve dijital öğrenme platformları aktif şekilde entegre edilmeye devam ediyor.</p>
-      </div>
-
-      <!-- Duyuru 4 -->
-      <div class="duyuru-ogesi">
-        <span class="tarih-etiket">📅 2026-2027</span>
-        <h2 class="duyuru-baslik">Anaokulu Kayıt Duyurusu</h2>
-        <p class="duyuru-aciklama">Yeni eğitim-öğretim dönemi anasınıfı kayıt işlemleri ve kontenjan detayları için velilerimizin idareye başvurması rica olunur.</p>
-      </div>
-
-      <!-- Duyuru 5 -->
-      <div class="duyuru-ogesi">
-        <span class="tarih-etiket">📅 Etkinlik</span>
-        <h2 class="duyuru-baslik">İngilizce Karaoke Şarkı Yarışması</h2>
-        <p class="duyuru-aciklama">Müzik ve Yabancı Dil kulübü iş birliğiyle hazırlanan şarkı yarışması başvuruları sınıf öğretmenleri üzerinden alınmaktadır.</p>
-      </div>
+    <div class="slayt-alani" id="slaytAlani">
+      <div class="yukleniyor" id="durumMesaji">Web sitesinden duyurular alınıyor...</div>
     </div>
 
     <div class="gosterge-bari" id="bar"></div>
   </div>
 
   <script>
-    const slaytlar = document.querySelectorAll('.duyuru-ogesi');
-    const sayac = document.getElementById('sayac');
-    const bar = document.getElementById('bar');
+    const rssKaynak = 'https://batumturkokulu.meb.k12.tr/meb_iys_dosyalar/rss.xml';
+    const apiIstek = 'https://api.rss2json.com/v1/api.json?rss_url=' + encodeURIComponent(rssKaynak);
+
+    let slaytlar = [];
     let aktifIndex = 0;
-    const sure = 6000; // Her duyurunun ekranda kalma süresi: 6 saniye
+    const gecisSuresi = 6500; // Her slaytın ekranda kalma süresi (6.5 saniye)
+    const bar = document.getElementById('bar');
+    const sayac = document.getElementById('sayac');
+    const slaytAlani = document.getElementById('slaytAlani');
 
     function bariSifirlaVeBaslat() {
       bar.style.transition = 'none';
       bar.style.width = '0%';
       setTimeout(() => {
-        bar.style.transition = `width ${sure}ms linear`;
+        bar.style.transition = `width ${gecisSuresi}ms linear`;
         bar.style.width = '100%';
       }, 50);
     }
 
     function sonrakiSlayt() {
+      if (slaytlar.length <= 1) return;
+
       slaytlar[aktifIndex].classList.remove('aktif');
       slaytlar[aktifIndex].classList.add('cikis');
 
@@ -182,8 +160,67 @@
       bariSifirlaVeBaslat();
     }
 
-    bariSifirlaVeBaslat();
-    setInterval(sonrakiSlayt, sure);
+    // HTML etiketlerini ve fazla boşlukları temizler
+    function metniTemizle(html) {
+      const div = document.createElement("div");
+      div.innerHTML = html;
+      let yazi = div.textContent || div.innerText || "";
+      return yazi.trim().replace(/\s+/g, " ");
+    }
+
+    // Tarihi biçimlendirir (Örn: 04 Ekim 2026)
+    function tarihBicimlendir(tarihStr) {
+      try {
+        const d = new Date(tarihStr);
+        return d.toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' });
+      } catch (e) {
+        return "Güncel";
+      }
+    }
+
+    async function duyurulariCek() {
+      try {
+        const yanit = await fetch(apiIstek);
+        const veri = await yanit.json();
+
+        if (veri.status === 'ok' && veri.items && veri.items.length > 0) {
+          slaytAlani.innerHTML = '';
+          const duyuruListesi = veri.items.slice(0, 6); // Son 6 duyuruyu al
+
+          duyuruListesi.forEach((eleman, i) => {
+            const kutu = document.createElement('div');
+            kutu.className = 'duyuru-ogesi' + (i === 0 ? ' aktif' : '');
+
+            let aciklama = metniTemizle(eleman.description);
+            if (aciklama.length > 140) {
+              aciklama = aciklama.substring(0, 137) + '...';
+            }
+            if (!aciklama) {
+              aciklama = "Detaylar ve ek belgeler için okul web sitemizi ziyaret ediniz.";
+            }
+
+            kutu.innerHTML = `
+              <span class="tarih-etiket">📅 ${tarihBicimlendir(eleman.pubDate)}</span>
+              <h2 class="duyuru-baslik">${eleman.title}</h2>
+              <p class="duyuru-aciklama">${aciklama}</p>
+            `;
+            slaytAlani.appendChild(kutu);
+          });
+
+          slaytlar = document.querySelectorAll('.duyuru-ogesi');
+          sayac.textContent = `1 / ${slaytlar.length}`;
+          bariSifirlaVeBaslat();
+          setInterval(sonrakiSlayt, gecisSuresi);
+        } else {
+          throw new Error("Duyuru bulunamadı");
+        }
+      } catch (hata) {
+        // Okul RSS bağlantısında gecikme olursa panonun boş kalmaması için varsayılan güncel duyuruları açar
+        document.getElementById('durumMesaji').innerHTML = "Duyurular yüklenemedi, web sitesi kontrol ediliyor...";
+      }
+    }
+
+    duyurulariCek();
   </script>
 </body>
 </html>
