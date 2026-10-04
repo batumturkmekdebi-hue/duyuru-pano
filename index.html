@@ -2,28 +2,76 @@
 <html lang="tr">
 <head>
   <meta charset="UTF-8">
+  <title>Okul Duyuruları</title>
   <style>
-    html, body {
-      margin: 0;
-      padding: 0;
-      width: 100%;
-      height: 100%;
-      overflow: hidden;
-      background: #fff;
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: #f8fafc;
+      font-family: 'Segoe UI', Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 10px;
     }
-    iframe {
-      width: 140%;
-      height: 180%;
-      border: none;
-      /* Üst logoyu ve yan boşlukları ekran dışına atar */
-      margin-top: -330px;
-      margin-left: -50px;
-      transform: scale(1.05);
-      transform-origin: 0 0;
+    .duyuru-kart {
+      width: 100%;
+      max-width: 650px;
+      background: #ffffff;
+      border-radius: 16px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+      overflow: hidden;
+      border: 1px solid #e2e8f0;
+    }
+    .baslik {
+      background: linear-gradient(135deg, #f97316, #ea580c);
+      color: white;
+      padding: 18px 24px;
+      font-size: 26px;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .liste {
+      list-style: none;
+      padding: 5px 0;
+    }
+    .liste li {
+      padding: 15px 24px;
+      font-size: 20px;
+      color: #334155;
+      border-bottom: 1px solid #f1f5f9;
+      display: flex;
+      align-items: center;
+      font-weight: 500;
+    }
+    .liste li:last-child {
+      border-bottom: none;
+    }
+    .liste li::before {
+      content: "»";
+      color: #f97316;
+      font-weight: bold;
+      font-size: 26px;
+      margin-right: 14px;
     }
   </style>
 </head>
 <body>
-  <iframe src="https://batumturkokulu.meb.k12.tr/icerikler/icerikler/listele_1666204_Duyurular" scrolling="no"></iframe>
+
+  <div class="duyuru-kart">
+    <div class="baslik">
+      📢 DUYURULAR
+    </div>
+    <ul class="liste">
+      <li>Eylül Dönemi Sorumluluk Sınavları</li>
+      <li>Duolingo İngilizce Bilgi Yarışması</li>
+      <li>Öğrenmede Yeni Nesil Yaklaşım</li>
+      <li>Anaokulu Kayıt Duyurusu</li>
+      <li>İngilizce Karaoke Şarkı Yarışması</li>
+    </ul>
+  </div>
+
 </body>
 </html>
